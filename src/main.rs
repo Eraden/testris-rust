@@ -21,62 +21,25 @@ fn main() {
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
-    let mut app = TetrisGame {
-        rng: rand::thread_rng(),
-        width: 11,
-        height: 20,
-        buffer: [
-            // grid
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 5
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 10
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 15
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 20
-            // current block
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            // next block
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        ],
-    };
+    let mut app = TetrisGame::new();
     app.fill_next();
-    println!("{:?}", app);
-    for y in 0..4 {
-        print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
-        print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
-        print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
-        print!("{:?}", app.buffer[220 + (y * 4) + 3]);
-        print!("\n");
-    }
+    // println!("{:?}", app);
+    // for y in 0..4 {
+    //     print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
+    //     print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
+    //     print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
+    //     print!("{:?}", app.buffer[220 + (y * 4) + 3]);
+    //     print!("\n");
+    // }
     app.fill_next();
-    println!("{:?}", app);
-    for y in 0..4 {
-        print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
-        print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
-        print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
-        print!("{:?}", app.buffer[220 + (y * 4) + 3]);
-        print!("\n");
-    }
+    // println!("{:?}", app);
+    // for y in 0..4 {
+    //     print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
+    //     print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
+    //     print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
+    //     print!("{:?}", app.buffer[220 + (y * 4) + 3]);
+    //     print!("\n");
+    // }
 
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
@@ -91,6 +54,12 @@ fn main() {
                 Event::Quit {..} |
                     Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                         break 'running
+                    },
+                    Event::KeyDown { Keycode: Some(Keycode::Right), .. } => {
+                        app.update(app::Action::Right);
+                    },
+                    Event::KeyDown { Keycode: Some(Keycode::Left), .. } => {
+                        app.update(app::Action::Left);
                     },
                     _ => {}
             }
