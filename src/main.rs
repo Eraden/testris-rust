@@ -1,14 +1,15 @@
 extern crate rand;
 extern crate sdl2;
 
-mod app;
+pub mod app;
+pub mod shape;
 
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-use app::SnakeGame;
+use app::TetrisGame;
 
 fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -20,7 +21,7 @@ fn main() {
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
-    let mut app = SnakeGame {
+    let mut app = TetrisGame {
         rng: rand::thread_rng(),
         width: 11,
         height: 20,
@@ -59,8 +60,23 @@ fn main() {
         ],
     };
     app.fill_next();
+    println!("{:?}", app);
+    for y in 0..4 {
+        print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
+        print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
+        print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
+        print!("{:?}", app.buffer[220 + (y * 4) + 3]);
+        print!("\n");
+    }
     app.fill_next();
     println!("{:?}", app);
+    for y in 0..4 {
+        print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
+        print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
+        print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
+        print!("{:?}", app.buffer[220 + (y * 4) + 3]);
+        print!("\n");
+    }
 
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
