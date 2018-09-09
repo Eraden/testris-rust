@@ -226,6 +226,7 @@ impl TetrisGame {
             }
         }
         self.step = self.step_delay.clone();
+        self.remove_full_lines();
     }
 
     fn copy_block(&mut self) {
@@ -320,6 +321,48 @@ impl TetrisGame {
 
         for i in 0..16 {
             b[s + i] = swap[i];
+        }
+    }
+
+    pub fn remove_full_lines(&mut self) {
+        let mut y: usize = self.height - 1;
+        loop {
+            if self.need_erase_line(y.clone()) {
+                self.drop(y.clone());
+                self.score += 10;
+            } else {
+                y -= 1;
+            }
+            if y == 0 {
+                break;
+            }
+        }
+    }
+
+    pub fn need_erase_line(&self, y: usize) -> bool {
+        let b: &[u8; 252] = &self.buffer;
+        let w: usize = self.width;
+        for x in 0..w {
+            if b[(y * w) + x] == 0 {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub fn drop(&mut self, begin: usize) {
+        let mut y: usize = begin;
+        let w: usize = self.width;
+        let b: &mut [u8; 252] = &mut self.buffer;
+        loop {
+            for x in 0..w {
+                b[(y * w) + x] = b[((y - 1) * w) + x];
+            }
+            y -= 1;
+
+            if y == 0 {
+                break;
+            }
         }
     }
 }
