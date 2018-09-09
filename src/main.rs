@@ -1,5 +1,7 @@
 extern crate rand;
 extern crate sdl2;
+#[cfg(test)]
+extern crate rlibc;
 
 pub mod app;
 pub mod shape;
@@ -39,6 +41,9 @@ fn main() {
                 Event::Quit {..} |
                     Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                         break 'running
+                    },
+                    Event::KeyDown { keycode: Some(Keycode::Up), .. } => {
+                        app.update(Action::Rotate);
                     },
                     Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
                         app.update(Action::MoveDown);

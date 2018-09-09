@@ -12,7 +12,7 @@ pub fn check_collision_no_collision() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     let next_pos = Pos { x: 0, y: 0 };
     assert_eq!(app.check_collision(next_pos), CollisionResult::NoCollision);
 }
@@ -28,7 +28,7 @@ pub fn check_collision_move_to_end_of_row() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     let next_pos = Pos { x: app.width, y: 0 };
     assert_eq!(app.check_collision(next_pos), CollisionResult::Collide);
 }
@@ -44,7 +44,7 @@ pub fn check_collision_move_to_end_of_column() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     let next_pos = Pos { x: 0, y: app.height };
     assert_eq!(app.check_collision(next_pos), CollisionResult::Collide);
 }
@@ -60,7 +60,7 @@ pub fn check_collision_block_moved_by_x1() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     let next_pos = Pos { x: app.width - 1, y: 0 };
     assert_eq!(app.check_collision(next_pos), CollisionResult::Collide);
 }
@@ -76,7 +76,7 @@ pub fn check_collision_block_moved_by_y1() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     let next_pos = Pos { x: 0, y: app.height - 1 };
     assert_eq!(app.check_collision(next_pos), CollisionResult::Collide);
 }

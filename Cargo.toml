@@ -6,4 +6,5 @@ authors = ["Adrian Wozniak <adrian.wozniak@ita-prog.pl>"]
 [dependencies]
 sdl2 = "*"
 rand = "0.5"
+rlibc = "1.0"
 

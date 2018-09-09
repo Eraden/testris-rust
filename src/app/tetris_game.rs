@@ -6,6 +6,8 @@ use sdl2;
 use sdl2::pixels::Color;
 
 use shape;
+use app::swap_tools;
+use app::swap_tools::TrimResult;
 
 pub const WAIT: f64 = 10.0_f64;
 pub const DECREASE_STEP_DELAY: f64 = 0.01_64;
@@ -102,8 +104,8 @@ impl TetrisGame {
                 0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0,
-                ],
-                pos: Pos { x: 5, y: 0 },
+            ],
+            pos: Pos { x: 5, y: 0 },
         }
     }
     pub fn fill_next(&mut self) {
@@ -138,10 +140,10 @@ impl TetrisGame {
                 };
                 canvas.set_draw_color(color);
                 canvas.fill_rect(sdl2::rect::Rect::new(
-                        ((x * CELL_DRAW_WIDTH as usize) + 145 + (x * 3)) as i32,
-                        ((y * CELL_DRAW_HEIGHT as usize) + 40 + (y * 3)) as i32,
-                        CELL_DRAW_WIDTH, CELL_DRAW_HEIGHT,
-                        )).unwrap();
+                    ((x * CELL_DRAW_WIDTH as usize) + 145 + (x * 3)) as i32,
+                    ((y * CELL_DRAW_HEIGHT as usize) + 40 + (y * 3)) as i32,
+                    CELL_DRAW_WIDTH, CELL_DRAW_HEIGHT,
+                )).unwrap();
             }
         }
     }
@@ -161,10 +163,10 @@ impl TetrisGame {
                 };
                 canvas.set_draw_color(color);
                 canvas.fill_rect(sdl2::rect::Rect::new(
-                        (grid_end_x + (x * CELL_DRAW_WIDTH as usize) + 40 + (x * 3)) as i32,
-                        ((y * CELL_DRAW_HEIGHT as usize) + 40 + (y * 3)) as i32,
-                        CELL_DRAW_WIDTH, CELL_DRAW_HEIGHT,
-                        )).unwrap();
+                    (grid_end_x + (x * CELL_DRAW_WIDTH as usize) + 40 + (x * 3)) as i32,
+                    ((y * CELL_DRAW_HEIGHT as usize) + 40 + (y * 3)) as i32,
+                    CELL_DRAW_WIDTH, CELL_DRAW_HEIGHT,
+                )).unwrap();
             }
         }
     }
@@ -183,10 +185,10 @@ impl TetrisGame {
                 };
                 canvas.set_draw_color(color);
                 canvas.fill_rect(sdl2::rect::Rect::new(
-                        (grid_end_x + (x * CELL_DRAW_WIDTH as usize) + 40 + (x * 3)) as i32,
-                        ((y * CELL_DRAW_HEIGHT as usize) + 200 + (y * 3)) as i32,
-                        CELL_DRAW_WIDTH, CELL_DRAW_HEIGHT,
-                        )).unwrap();
+                    (grid_end_x + (x * CELL_DRAW_WIDTH as usize) + 40 + (x * 3)) as i32,
+                    ((y * CELL_DRAW_HEIGHT as usize) + 200 + (y * 3)) as i32,
+                    CELL_DRAW_WIDTH, CELL_DRAW_HEIGHT,
+                )).unwrap();
             }
         }
     }
@@ -196,42 +198,43 @@ impl TetrisGame {
             Action::MoveDown => {
                 let next_pos = Pos { x: self.pos.x, y: self.pos.y + 1 };
                 match self.check_collision(next_pos) {
-                    CollisionResult::Collide => {},
+                    CollisionResult::Collide => {}
                     CollisionResult::NoCollision => {
                         self.pos.y += 1;
                     }
                 }
-            },
+            }
             Action::MoveLeft => {
                 if self.pos.x == 0 {
                     return;
                 }
                 let next_pos = Pos { x: self.pos.x - 1, y: self.pos.y };
                 match self.check_collision(next_pos) {
-                    CollisionResult::Collide => {},
+                    CollisionResult::Collide => {}
                     CollisionResult::NoCollision => {
                         self.pos.x -= 1;
                     }
                 }
-            },
+            }
             Action::MoveRight => {
                 if self.pos.x == self.width - 1 {
                     return;
                 }
                 let next_pos = Pos { x: self.pos.x + 1, y: self.pos.y };
                 match self.check_collision(next_pos) {
-                    CollisionResult::Collide => {},
+                    CollisionResult::Collide => {}
                     CollisionResult::NoCollision => {
                         self.pos.x += 1;
                     }
                 }
-            },
-            Action::Rotate => {},
+            }
+            Action::Rotate => {
+                self.rotate_current();
+            }
             Action::Update => {
                 self.do_step();
-            },
-            Action::NoOP => {
-            },
+            }
+            Action::NoOP => {}
         }
     }
 
@@ -249,7 +252,7 @@ impl TetrisGame {
                 self.step_delay = self.step_delay - 0.01f64;
                 self.pos.x = 5_usize;
                 self.pos.y = 0_usize;
-            },
+            }
             CollisionResult::NoCollision => {
                 self.pos.y += 1_usize;
             }
@@ -307,7 +310,7 @@ impl TetrisGame {
         self.buffer[(y * self.width) + x]
     }
 
-    pub fn is_taken(&mut self, x: usize, y: usize) -> AvailabilityResult {
+    pub fn is_taken(&self, x: usize, y: usize) -> AvailabilityResult {
         let pos = &self.pos;
         for cy in 0..4 {
             for cx in 0..4 {
@@ -316,11 +319,40 @@ impl TetrisGame {
                 let cell = self.at_cell(x, y);
                 let block = self.at_block(cx, cy);
                 if (cell == 1) || (px == x && py == y && block == 1) {
-                    return AvailabilityResult::Taken
+                    return AvailabilityResult::Taken;
                 }
             }
         }
         AvailabilityResult::Free
+    }
+
+    pub fn rotate_current(&mut self) {
+        let b = &mut self.buffer;
+        let w = self.width;
+        let h = self.height;
+        let s = w * h;
+        let mut swap = [
+            b[s + 3], b[s + 7], b[s + 11], b[s + 15],
+            b[s + 2], b[s + 6], b[s + 10], b[s + 14],
+            b[s + 1], b[s + 5], b[s + 9], b[s + 13],
+            b[s + 0], b[s + 4], b[s + 8], b[s + 12],
+        ];
+
+        loop {
+            match swap_tools::need_trim(&swap) {
+                TrimResult::Nothing => break,
+                TrimResult::Left => swap_tools::trim_left(&mut swap),
+                TrimResult::Top => swap_tools::trim_top(&mut swap),
+                TrimResult::Both => {
+                    swap_tools::trim_left(&mut swap);
+                    swap_tools::trim_top(&mut swap);
+                }
+            }
+        }
+
+        for i in 0..16 {
+            b[s + i] = swap[i];
+        }
     }
 }
 

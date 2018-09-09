@@ -12,7 +12,7 @@ fn check_complex_block() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     // y = 0
     assert_eq!(app.is_taken(0, 0), AvailabilityResult::Taken);
     assert_eq!(app.is_taken(1, 0), AvailabilityResult::Taken);
@@ -34,7 +34,7 @@ fn check_moved_cursor_complex_block() {
         0, 0, 0, 0,
         0, 0, 0, 0,
     ];
-    app.test_inject_current_block(current_block);
+    app.test_inject_current_block(&current_block);
     app.pos.x = 2;
     app.pos.y = 0;
     // y = 0
