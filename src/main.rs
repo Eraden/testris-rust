@@ -9,7 +9,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-use app::TetrisGame;
+use app::tetris_game::{ TetrisGame, Action };
 
 fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -23,30 +23,15 @@ fn main() {
     let mut canvas = window.into_canvas().build().unwrap();
     let mut app = TetrisGame::new();
     app.fill_next();
-    // println!("{:?}", app);
-    // for y in 0..4 {
-    //     print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
-    //     print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
-    //     print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
-    //     print!("{:?}", app.buffer[220 + (y * 4) + 3]);
-    //     print!("\n");
-    // }
     app.fill_next();
-    // println!("{:?}", app);
-    // for y in 0..4 {
-    //     print!("{:?} ", app.buffer[220 + (y * 4) + 0]);
-    //     print!("{:?} ", app.buffer[220 + (y * 4) + 1]);
-    //     print!("{:?} ", app.buffer[220 + (y * 4) + 2]);
-    //     print!("{:?}", app.buffer[220 + (y * 4) + 3]);
-    //     print!("\n");
-    // }
+    println!("{:?}", app.pos);
 
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
+    let sleep_time = Duration::new(0, 1_000_000_000u32 / 60);
     'running: loop {
-        app.update(0);
         canvas.set_draw_color(Color::RGB(255, 255, 255));
         canvas.clear();
         for event in event_pump.poll_iter() {
@@ -55,17 +40,23 @@ fn main() {
                     Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                         break 'running
                     },
-                    Event::KeyDown { Keycode: Some(Keycode::Right), .. } => {
-                        app.update(app::Action::Right);
+                    Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+                        app.update(Action::MoveDown);
                     },
-                    Event::KeyDown { Keycode: Some(Keycode::Left), .. } => {
-                        app.update(app::Action::Left);
+                    Event::KeyDown { keycode: Some(Keycode::Right), .. } => {
+                        app.update(Action::MoveRight);
                     },
-                    _ => {}
+                    Event::KeyDown { keycode: Some(Keycode::Left), .. } => {
+                        app.update(Action::MoveLeft);
+                    },
+                    _ => {
+                        app.update(Action::NoOP);
+                    }
             }
         }
+        app.update(Action::Update);
         app.render(&mut canvas);
         canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+        ::std::thread::sleep(sleep_time);
     }
 }
