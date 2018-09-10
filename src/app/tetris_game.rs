@@ -100,22 +100,17 @@ impl TetrisGame {
     }
 
     fn render_score(&mut self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) {
-        if self.flush {
-            canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
-            self.clear(canvas);
-            let s: String = format!("{}", self.score);
-            self.build_text(&mut *canvas, s);
-            self.flush = false;
-        }
+        canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
+        self.clear(canvas);
+        let s: String = format!("{}", self.score);
+        self.build_text(&mut *canvas, s);
+        self.flush = false;
     }
 
     fn render_grid(&mut self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) {
         let w = self.width;
         let h = self.height;
 
-        // 11 * 20 = 220 / 2 = 110
-        // 800 / 2 = 400
-        // 400 - 110 = 290 / 2 145
         for y in 0..h {
             for x in 0..w {
                 let color = match self.is_taken(x, y) {
@@ -183,9 +178,8 @@ impl TetrisGame {
             .load_font("./assets/fonts/Roboto-Medium.ttf", 128)
             .unwrap();
         font.set_style(sdl2::ttf::STYLE_BOLD);
-        let t = "100".to_string();
         let surface = font
-            .render(t.as_str())
+            .render(text.as_str())
             .blended(Color::RGBA(255, 0, 0, 255))
             .unwrap();
         let texture_creator = canvas.texture_creator();
