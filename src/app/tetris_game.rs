@@ -3,7 +3,9 @@ use rand;
 use std::fmt;
 
 use sdl2;
+use sdl2::render::TextureQuery;
 use sdl2::pixels::Color;
+use sdl2::rect::Rect;
 
 use shape;
 use app::swap_tools;
@@ -53,6 +55,7 @@ pub struct TetrisGame {
     pub pos: Pos,
     pub taken_cell: sdl2::pixels::Color,
     pub free_cell: sdl2::pixels::Color,
+    pub flush: bool,
 }
 
 impl fmt::Debug for TetrisGame {
@@ -74,8 +77,10 @@ impl TetrisGame {
             height: 20,
             buffer: [0; 252],
             pos: Pos { x: 5, y: 0 },
+            flush: true,
         }
     }
+
     pub fn fill_next(&mut self) {
         let w = self.width;
         let h = self.height;
@@ -88,9 +93,20 @@ impl TetrisGame {
     }
 
     pub fn render(&mut self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) {
+        self.render_score(&mut *canvas);
         self.render_grid(&mut *canvas);
         self.render_current_preview(&mut *canvas);
         self.render_next_preview(&mut *canvas);
+    }
+
+    fn render_score(&mut self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) {
+        if self.flush {
+            canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
+            self.clear(canvas);
+            let s: String = format!("{}", self.score);
+            self.build_text(&mut *canvas, s);
+            self.flush = false;
+        }
     }
 
     fn render_grid(&mut self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) {
@@ -159,6 +175,34 @@ impl TetrisGame {
                 )).unwrap();
             }
         }
+    }
+
+    fn build_text(&self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>, text: String) {
+        let ttf_context = sdl2::ttf::init().unwrap();
+        let mut font = ttf_context
+            .load_font("./assets/fonts/Roboto-Medium.ttf", 128)
+            .unwrap();
+        font.set_style(sdl2::ttf::STYLE_BOLD);
+        let t = "100".to_string();
+        let surface = font
+            .render(t.as_str())
+            .blended(Color::RGBA(255, 0, 0, 255))
+            .unwrap();
+        let texture_creator = canvas.texture_creator();
+        let texture = texture_creator
+            .create_texture_from_surface(&surface)
+            .unwrap();
+        let rect = Rect::new(300 + (text.len() * 150) as i32, 300, 100, (text.len() * 30) as u32);
+        canvas.copy(
+            &texture,
+            None,
+            Some(rect)
+        ).unwrap();
+    }
+
+    pub fn clear(&mut self, canvas: &mut sdl2::render::Canvas<sdl2::video::Window>) {
+        canvas.set_draw_color(Color::RGB(255, 255, 255));
+        canvas.clear();
     }
 
     pub fn update(&mut self, action: Action) {
@@ -330,6 +374,7 @@ impl TetrisGame {
             if self.need_erase_line(y.clone()) {
                 self.drop(y.clone());
                 self.score += 10;
+                self.flush = true;
             } else {
                 y -= 1;
             }

@@ -1,13 +1,11 @@
 extern crate rand;
 extern crate sdl2;
-#[cfg(test)]
-extern crate rlibc;
 
 pub mod app;
 pub mod shape;
 
-use sdl2::pixels::Color;
 use sdl2::event::Event;
+use sdl2::pixels::Color;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
@@ -26,16 +24,13 @@ fn main() {
     let mut app = TetrisGame::new();
     app.fill_next();
     app.fill_next();
-    println!("{:?}", app.pos);
+    app.clear(&mut canvas);
 
-    canvas.set_draw_color(Color::RGB(0, 255, 255));
-    canvas.clear();
+    canvas.set_draw_color(Color::RGBA(255, 255, 255, 255));
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     let sleep_time = Duration::new(0, 1_000_000_000u32 / 60);
     'running: loop {
-        canvas.set_draw_color(Color::RGB(255, 255, 255));
-        canvas.clear();
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |

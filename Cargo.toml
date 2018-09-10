@@ -4,7 +4,8 @@ version = "0.1.0"
 authors = ["Adrian Wozniak <adrian.wozniak@ita-prog.pl>"]
 
 [dependencies]
-sdl2 = "*"
 rand = "0.5"
-rlibc = "1.0"
 
+[dependencies.sdl2]
+version = "*"
+features = ["gfx", "image", "mixer", "ttf", "static-link", "bundled"]
